@@ -14,6 +14,7 @@ const STORAGE_KEY = 'diabecheck_reminders';
 export function useNotifications() {
   const reminders = ref<Reminder[]>([]);
   const hasPermission = ref(false);
+  const permissionUnsupported = ref(false);
 
   const loadReminders = () => {
     const saved = localStorage.getItem(STORAGE_KEY);
@@ -35,14 +36,26 @@ export function useNotifications() {
   };
 
   const requestPermission = async () => {
-    if (!('Notification' in window)) return false;
+    if (!('Notification' in window)) {
+      // Browser doesn't support Web Notifications (common in older iOS Safari)
+      permissionUnsupported.value = true;
+      // Provide an in-app hint to the user; keep using internal alerts as fallback
+      try { alert('Tu navegador no soporta notificaciones web. La app usará alertas internas.'); } catch (e) {}
+      return false;
+    }
+
     const permission = await Notification.requestPermission();
     hasPermission.value = permission === 'granted';
     return hasPermission.value;
   };
 
   const checkPermission = () => {
-    if (!('Notification' in window)) return;
+    if (!('Notification' in window)) {
+      permissionUnsupported.value = true;
+      hasPermission.value = false;
+      return;
+    }
+
     hasPermission.value = Notification.permission === 'granted';
   };
 
@@ -104,6 +117,7 @@ export function useNotifications() {
   return {
     reminders,
     hasPermission,
+    permissionUnsupported,
     activeAlert,
     requestPermission,
     addReminder,

@@ -5,10 +5,24 @@
         <h2 class="text-xl font-black uppercase tracking-widest text-ue-text">Recordatorios</h2>
         <p class="text-[10px] font-bold text-ue-muted uppercase tracking-widest leading-none mt-1">Gestión de alertas diarias</p>
       </div>
-      <button v-if="!hasPermission" @click="requestPermission" class="bg-ue-red-500/10 text-ue-red-500 px-3 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
+      <button v-if="!hasPermission && !permissionUnsupported" @click="requestPermission" class="bg-ue-red-500/10 text-ue-red-500 px-3 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
         <BellRing class="w-4 h-4" /> Activar Notificaciones
       </button>
+      <button v-else-if="permissionUnsupported" @click="showPermissionInfo = true" class="bg-ue-red-500/10 text-ue-red-500 px-3 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
+        <BellRing class="w-4 h-4" /> Notificaciones no soportadas
+      </button>
     </header>
+
+    <!-- Permission Info Modal -->
+    <div v-if="showPermissionInfo" class="fixed inset-0 bg-black/40 flex items-end sm:items-center justify-center p-4" @click.self="showPermissionInfo = false">
+      <div class="bg-white rounded-2xl p-6 max-w-md w-full text-ue-text">
+        <h3 class="font-black uppercase tracking-wider">Notificaciones en iOS</h3>
+        <p class="mt-2 text-sm text-ue-muted">Safari en iOS puede no soportar notificaciones web. La app seguirá mostrando alertas internas en pantalla cuando sea necesario.</p>
+        <div class="mt-4 flex gap-2">
+          <button @click="showPermissionInfo = false" class="btn-ue-secondary">Cerrar</button>
+        </div>
+      </div>
+    </div>
 
     <!-- Reminders List -->
     <div class="grid gap-4">
@@ -115,12 +129,15 @@ import { useNotifications } from '../composables/useNotifications';
 const { 
   reminders, 
   hasPermission, 
+  permissionUnsupported,
   activeAlert, 
   requestPermission, 
   addReminder,
   toggleReminder, 
   deleteReminder 
 } = useNotifications();
+
+const showPermissionInfo = ref(false);
 
 const showAddDialog = ref(false);
 const newReminder = ref({

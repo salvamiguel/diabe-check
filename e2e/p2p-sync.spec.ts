@@ -68,8 +68,16 @@ test.describe('Sincronización P2P DiabeCheck', () => {
     // Comprobar que el estado cambia a HIPERGLUCEMIA en la vista del cuidador
     await expect(caretakerPage.locator('text=HIPERGLUCEMIA')).toBeVisible();
 
+    // 6. Simular paciente desconectado y refresco del cuidador
+    await patientContext.close(); // paciente offline
+    await caretakerPage.reload();
+
+    // tras reload, debería conservar el último valor guardado aun sin conexión
+    await expect(caretakerPage.locator('text=185')).toBeVisible();
+    // la etiqueta LIVE ya no debería mostrarse porque no hay conexión
+    await expect(caretakerPage.locator('span:has-text("Live")')).toHaveCount(0);
+
     // Limpieza
-    await patientContext.close();
     await caretakerContext.close();
   });
 });

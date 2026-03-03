@@ -9,6 +9,41 @@ export function useCaretakerSync(entriesRef?: Ref<Entry[]>, profileRef?: Ref<Use
   const activePatientProfile = ref<(UserProfile & { id: string }) | null>(null);
   const patientList = ref<PatientConnection[]>(JSON.parse(localStorage.getItem('diabecheck_patient_list') || '[]'));
   
+  // persistence helpers for caretaker side
+  const STORAGE_KEY_PREFIX = 'diabecheck_caretaker_';
+  const LAST_PATIENT_KEY = 'diabecheck_last_patient';
+
+  const saveCaretakerData = (patientId: string, data: Entry[], profile: any) => {
+    try {
+      localStorage.setItem(
+        `${STORAGE_KEY_PREFIX}${patientId}`,
+        JSON.stringify({ data, profile, lastSync: Date.now() })
+      );
+    } catch {}
+  };
+  const loadCaretakerData = (patientId: string) => {
+    const raw = localStorage.getItem(`${STORAGE_KEY_PREFIX}${patientId}`);
+    if (!raw) return null;
+    try {
+      return JSON.parse(raw);
+    } catch {
+      return null;
+    }
+  };
+  const clearCaretakerData = (patientId: string) => {
+    localStorage.removeItem(`${STORAGE_KEY_PREFIX}${patientId}`);
+  };
+
+  const setLastPatientId = (id: string) => {
+    localStorage.setItem(LAST_PATIENT_KEY, id);
+  };
+  const getLastPatientId = () => {
+    return localStorage.getItem(LAST_PATIENT_KEY);
+  };
+  const clearLastPatientId = () => {
+    localStorage.removeItem(LAST_PATIENT_KEY);
+  };
+  
   const peer = ref<Peer | null>(null);
   const conn = ref<DataConnection | null>(null);
   const myPeerId = ref<string>('');
@@ -21,6 +56,7 @@ export function useCaretakerSync(entriesRef?: Ref<Entry[]>, profileRef?: Ref<Use
   const removePatient = (id: string) => {
     patientList.value = patientList.value.filter(p => p.id !== id);
     savePatientList();
+    clearCaretakerData(id);
     if (activePatientProfile.value && activePatientProfile.value.id === id) {
       exitCaretakerMode();
     }
@@ -68,6 +104,16 @@ export function useCaretakerSync(entriesRef?: Ref<Entry[]>, profileRef?: Ref<Use
   const initCaretakerSession = (targetPeerId: string) => {
     isCaretakerMode.value = true;
     connectionStatus.value = 'connecting';
+
+    // remember last selected patient so page refresh can restore state
+    setLastPatientId(targetPeerId);
+
+    // load any previously cached data for this patient
+    const cached = loadCaretakerData(targetPeerId);
+    if (cached) {
+      caretakerData.value = cached.data || [];
+      activePatientProfile.value = cached.profile || null;
+    }
     
     if (!peer.value || peer.value.destroyed) peer.value = new Peer();
     
@@ -84,6 +130,9 @@ export function useCaretakerSync(entriesRef?: Ref<Entry[]>, profileRef?: Ref<Use
         if (payload.type === 'SYNC_FULL') {
           caretakerData.value = payload.data;
           activePatientProfile.value = payload.profile;
+          
+          // persist the received payload for offline use
+          saveCaretakerData(targetPeerId, payload.data, payload.profile);
           
           const existing = patientList.value.findIndex(p => p.id === targetPeerId);
           const patientInfo: PatientConnection = {
@@ -114,8 +163,8 @@ export function useCaretakerSync(entriesRef?: Ref<Entry[]>, profileRef?: Ref<Use
   const exitCaretakerMode = () => {
     if (conn.value) conn.value.close();
     isCaretakerMode.value = false;
-    caretakerData.value = [];
-    activePatientProfile.value = null;
+    // keep data around in memory/public but clear the stored last patient id
+    clearLastPatientId();
     const url = new URL(window.location.origin + window.location.pathname);
     window.history.replaceState({}, '', url.toString());
   };

@@ -23,6 +23,13 @@
   }
 }
 
+/* Prevent iOS Safari auto-zoom on inputs by ensuring font-size >= 16px on mobile */
+@media (max-width: 1024px) {
+  input, select, textarea {
+    font-size: 16px;
+  }
+}
+
 @layer components {
   /* Botones base con estilo UE */
   .btn-ue-primary {

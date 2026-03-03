@@ -221,7 +221,13 @@ onMounted(() => {
   if (peer) {
     initCaretakerSession(peer);
   } else {
-    initPatientSession();
+    // try to resume last caretaker session if available
+    const last = localStorage.getItem('diabecheck_last_patient');
+    if (last) {
+      initCaretakerSession(last);
+    } else {
+      initPatientSession();
+    }
   }
 });
 
