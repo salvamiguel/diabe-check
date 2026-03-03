@@ -1,4 +1,4 @@
-import { ref, watch } from 'vue';
+import { ref } from 'vue';
 import CryptoJS from 'crypto-js';
 import type { Entry, UserProfile } from '../types';
 
@@ -48,11 +48,11 @@ export function useStorage() {
   };
 
   const addEntry = (entry: Omit<Entry, 'id' | 'timestamp'>) => {
-    const newEntry: Entry = {
+    const newEntry = {
       ...entry,
       id: crypto.randomUUID(),
       timestamp: Date.now()
-    };
+    } as Entry;
     entries.value = [newEntry, ...entries.value];
     saveData();
   };

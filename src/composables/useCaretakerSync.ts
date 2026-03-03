@@ -37,9 +37,6 @@ export function useCaretakerSync(entriesRef?: Ref<Entry[]>, profileRef?: Ref<Use
   const setLastPatientId = (id: string) => {
     localStorage.setItem(LAST_PATIENT_KEY, id);
   };
-  const getLastPatientId = () => {
-    return localStorage.getItem(LAST_PATIENT_KEY);
-  };
   const clearLastPatientId = () => {
     localStorage.removeItem(LAST_PATIENT_KEY);
   };
@@ -62,7 +59,7 @@ export function useCaretakerSync(entriesRef?: Ref<Entry[]>, profileRef?: Ref<Use
     }
   };
 
-  const sendDataToCaretaker = (c: DataConnection) => {
+  const sendDataToCaretaker = (c: any) => {
     if (entriesRef && profileRef) {
       try {
         c.send({ 
@@ -171,7 +168,7 @@ export function useCaretakerSync(entriesRef?: Ref<Entry[]>, profileRef?: Ref<Use
 
   if (entriesRef && !isCaretakerMode.value) {
     watch(entriesRef, () => {
-      if (conn.value?.open) sendDataToCaretaker(conn.value);
+      if (conn.value?.open) sendDataToCaretaker(conn.value as any);
     }, { deep: true });
   }
 

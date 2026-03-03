@@ -88,7 +88,6 @@ import {
   History, 
   Bell, 
   User, 
-  Search,
   Activity
 } from 'lucide-vue-next';
 import Dashboard from './components/Dashboard.vue';

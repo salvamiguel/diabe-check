@@ -63,6 +63,15 @@
 
         <div class="flex items-baseline gap-2">
           <span class="text-7xl font-black tracking-tighter leading-none">{{ lastGlucose }}</span>
+          <span v-if="glucoseTrend === 'up'" class="text-ue-red-500">
+            <ArrowUp class="w-6 h-6 inline-block" />
+          </span>
+          <span v-else-if="glucoseTrend === 'down'" class="text-blue-500">
+            <ArrowDown class="w-6 h-6 inline-block" />
+          </span>
+          <span v-else class="text-green-500">
+            <ArrowRight class="w-6 h-6 inline-block" />
+          </span>
           <span class="text-xl font-bold opacity-60 uppercase tracking-widest">mg/dL</span>
         </div>
 
@@ -128,7 +137,7 @@
         </button>
       </div>
       <div class="p-6">
-        <GlucoseChart :entries="displayEntries" />
+        <GlucoseChart :entries="displayEntries" :profile="currentProfile" />
       </div>
     </section>
 
@@ -176,7 +185,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
-import { Droplets, Syringe, Activity, FileDown, Share2, Users, History, X } from 'lucide-vue-next';
+import { Droplets, Syringe, Activity, FileDown, Share2, Users, History, X, ArrowUp, ArrowRight, ArrowDown } from 'lucide-vue-next';
 import QrcodeVue from 'qrcode.vue';
 import EntryForm from './forms/EntryForm.vue';
 import GlucoseChart from './charts/GlucoseChart.vue';
@@ -189,12 +198,10 @@ const { generatePDF } = useReporting();
 const { 
   isCaretakerMode, 
   caretakerData, 
-  myPeerId, 
   connectionStatus, 
   generateSyncLink, 
   initPatientSession,
   initCaretakerSession,
-  exitCaretakerMode,
   removePatient,
   activePatientProfile,
   patientList
@@ -257,11 +264,23 @@ const handleSave = (entry: any) => {
 };
 
 // Lógica de visualización basada en el perfil del paciente
-const currentProfile = computed(() => isCaretakerMode.value ? activePatientProfile.value : userProfile.value);
+const currentProfile = computed(() => isCaretakerMode.value ? activePatientProfile.value ?? undefined : userProfile.value);
 
 const lastGlucose = computed(() => {
   const g = displayEntries.value.find(e => e.type === 'glucose');
   return g ? g.value : '--';
+});
+
+// compute trend based on last two glucose readings
+const glucoseTrend = computed<'up' | 'down' | 'stable'>(() => {
+  const gEntries = displayEntries.value.filter(e => e.type === 'glucose');
+  if (gEntries.length < 2) return 'stable';
+  const last = gEntries[0]?.value;
+  const prev = gEntries[1]?.value;
+  if (typeof last !== 'number' || typeof prev !== 'number') return 'stable';
+  if (last > prev) return 'up';
+  if (last < prev) return 'down';
+  return 'stable';
 });
 
 const lastInsulin = computed(() => {
@@ -298,7 +317,9 @@ const timeInRange = computed(() => {
 
 const updateLabel = computed(() => {
   if (displayEntries.value.length === 0) return 'Sin registros';
-  const diff = Math.floor((Date.now() - displayEntries.value[0].timestamp) / 60000);
+  const first = displayEntries.value[0];
+  if (!first) return 'Sin registros';
+  const diff = Math.floor((Date.now() - first.timestamp) / 60000);
   return diff < 1 ? 'Ahora' : `Hace ${diff} min`;
 });
 </script>

@@ -145,7 +145,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref } from 'vue';
 import { Activity, User } from 'lucide-vue-next';
 import { useAccessibility } from '../composables/useAccessibility';
 import { useStorage } from '../composables/useStorage';

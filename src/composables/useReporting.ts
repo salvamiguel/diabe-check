@@ -9,8 +9,8 @@ export function useReporting() {
     const fullName = profile ? `${profile.name} ${profile.lastName}` : 'Paciente DiabeCheck';
 
     // Estilos de Marca Universidad Europea
-    const UE_RED = [111, 7, 20]; // #6F0714
-    const TEXT_COLOR = [19, 24, 25]; // #131819
+    const UE_RED: [number, number, number] = [111, 7, 20]; // #6F0714
+    const TEXT_COLOR: [number, number, number] = [19, 24, 25]; // #131819
 
     // Header
     doc.setFillColor(UE_RED[0], UE_RED[1], UE_RED[2]);
@@ -52,8 +52,8 @@ export function useReporting() {
 
     // Resumen Estadístico
     const glucoseEntries = entries.filter((e): e is GlucoseEntry => e.type === 'glucose');
-    const minRange = profile?.settings.glucoseMin || 70;
-    const maxRange = profile?.settings.glucoseMax || 180;
+    const minRange = profile?.settings.glucoseMin ?? 70;
+    const maxRange = profile?.settings.glucoseMax ?? 180;
 
     const avg = glucoseEntries.length ? Math.round(glucoseEntries.reduce((acc, curr) => acc + curr.value, 0) / glucoseEntries.length) : 0;
     const tir = glucoseEntries.length ? Math.round((glucoseEntries.filter(e => e.value >= minRange && e.value <= maxRange).length / glucoseEntries.length) * 100) : 0;
@@ -66,7 +66,7 @@ export function useReporting() {
         [`Tiempo en Rango (${minRange}-${maxRange})`, `${tir}%`],
         ['Total de Registros', entries.length.toString()],
       ],
-      headStyles: { fillColor: UE_RED, fontStyle: 'bold' },
+      headStyles: { fillColor: UE_RED as [number,number,number], fontStyle: 'bold' },
       theme: 'grid'
     });
 

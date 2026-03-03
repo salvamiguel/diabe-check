@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 
 // Mocks
 const localStorageMock = (() => {
@@ -38,6 +38,6 @@ describe('useStorage', () => {
     // @ts-ignore
     addEntry(entry);
     expect(entries.value.length).toBe(1);
-    expect(entries.value[0].value).toBe(120);
+    expect(entries.value[0]?.value).toBe(120);
   });
 });
