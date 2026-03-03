@@ -8,7 +8,7 @@ const ENCRYPTION_SECRET = import.meta.env.VITE_ENCRYPTION_KEY || 'ue-diabecheck-
 export function useStorage() {
   const entries = ref<Entry[]>([]);
   const userProfile = ref<UserProfile>({
-    name: 'Nombre',
+    name: 'Usuario',
     lastName: 'Apellido',
     age: null,
     sex: null,
