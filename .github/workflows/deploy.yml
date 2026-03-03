@@ -21,9 +21,9 @@ jobs:
         uses: actions/checkout@v4
       
       - name: Set up Node
-        uses: actions/node-js@v4
+        uses: actions/setup-node@v4
         with:
-          node-js-version: 20
+          node-version: 20
           cache: 'npm'
           
       - name: Install dependencies
@@ -51,9 +51,9 @@ jobs:
         uses: actions/checkout@v4
       
       - name: Set up Node
-        uses: actions/node-js@v4
+        uses: actions/setup-node@v4
         with:
-          node-js-version: 20
+          node-version: 20
           cache: 'npm'
           
       - name: Install dependencies
