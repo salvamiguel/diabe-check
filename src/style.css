@@ -1,0 +1,73 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --ue-white: #F9F9F9;
+  --ue-surface: #FFFFFF;
+  --ue-text: #131819;
+  --ue-muted: #9799AB;
+  --ue-red-800: #940E20;
+  --ue-red-700: #6F0714;
+  --ue-red-500: #F82F28;
+  --ue-border: #E9E9EE;
+  --ue-focus: rgba(248, 47, 40, 0.35);
+  --font-sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Helvetica Neue", sans-serif;
+}
+
+@layer base {
+  html, body {
+    @apply m-0 p-0 w-full h-full;
+    background-color: var(--ue-white);
+    color: var(--ue-text);
+  }
+}
+
+@layer components {
+  /* Botones base con estilo UE */
+  .btn-ue-primary {
+    @apply bg-ue-red-500 text-white rounded-lg px-6 py-3 font-bold transition-all 
+           hover:bg-ue-red-700 active:scale-95 focus:ring-4 focus:ring-ue-focus outline-none;
+  }
+  
+  .btn-ue-secondary {
+    @apply bg-white text-ue-text border border-ue-border rounded-lg px-6 py-3 font-bold 
+           transition-all hover:bg-ue-white active:scale-95 focus:ring-4 focus:ring-ue-focus outline-none;
+  }
+
+  /* Clases de utilidad para containers */
+  .ue-card {
+    @apply bg-white rounded-xl border border-ue-border p-4 shadow-sm;
+  }
+
+  .ue-header-badge {
+    @apply px-3 py-1 rounded-full text-sm font-medium transition-all;
+  }
+}
+
+/* HIGH CONTRAST MODE CORE */
+.high-contrast {
+  --ue-white: #FFFFFF !important;
+  --ue-surface: #FFFFFF !important;
+  --ue-text: #000000 !important;
+  --ue-muted: #222222 !important;
+  --ue-red-500: #000000 !important;
+  --ue-red-700: #000000 !important;
+  --ue-red-800: #000000 !important;
+  --ue-border: #000000 !important;
+}
+
+.high-contrast body {
+  @apply bg-white text-black !important;
+}
+
+.high-contrast input, 
+.high-contrast select, 
+.high-contrast textarea {
+  @apply bg-white text-black border-4 border-black !important;
+  border-radius: 4px !important;
+}
+
+.high-contrast button {
+  @apply border-2 border-black font-black uppercase !important;
+}
