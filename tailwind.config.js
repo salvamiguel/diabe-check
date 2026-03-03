@@ -19,6 +19,9 @@ export default {
       fontFamily: {
         sans: ['ui-sans-serif', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'Arial', '"Noto Sans"', '"Helvetica Neue"', 'sans-serif'],
       },
+      ringColor: {
+        'ue-focus': 'rgba(248, 47, 40, 0.35)',
+      },
     },
   },
   plugins: [],
